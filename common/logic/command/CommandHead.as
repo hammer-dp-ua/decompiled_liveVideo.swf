@@ -183,9 +183,8 @@ package common.logic.command
       
       public function parseCommandHead(... rest) : int
       {
-         var _loc2_:ByteArray = null;
-         var _loc4_:ByteArray = null;
-         var _loc5_:int = 0;
+         var responseDataParam:ByteArray = null;
+         var parsedResult:ByteArray = null;
          var legalParameters:Boolean = false;
          
          if(rest.length == 1)
@@ -196,8 +195,8 @@ package common.logic.command
                {
                   return CommandError.SN_ERROR_COMMAND_HEAD_PARSE_ERROR;
                }
-               _loc2_ = rest[0].getData();
-               _loc2_.position = 0;
+               responseDataParam = rest[0].getData();
+               responseDataParam.position = 0;
                legalParameters = true;
             }
          }
@@ -213,39 +212,46 @@ package common.logic.command
                {
                   return CommandError.SN_ERROR_COMMAND_HEAD_PARSE_ERROR;
                }
-               _loc2_ = rest[0];
-               _loc2_.position = 0;
+               responseDataParam = rest[0];
+               responseDataParam.position = 0;
                legalParameters = true;
             }
          }
          
-         if(legalParameters)
+         if (legalParameters)
          {
-            _loc4_ = new ByteArray();
-            _loc5_ = 0;
-            _loc4_.writeInt(_loc2_.readInt());
-            _loc4_.position = 0;
-            _loc5_ = _loc5_ + _loc4_.length;
-            this.m_iCommandId = _loc4_.readInt();
-            this.m_byVersion.writeByte(_loc2_.readByte());
+            parsedResult = new ByteArray();
+            var sumBytes:int = 0;
+            
+            parsedResult.writeInt(responseDataParam.readInt());
+            parsedResult.position = 0;
+            sumBytes += parsedResult.length;
+            this.m_iCommandId = parsedResult.readInt();
+            
+            this.m_byVersion.writeByte(responseDataParam.readByte());
             this.m_byVersion.position = 0;
-            _loc5_ = _loc5_ + this.m_byVersion.length;
-            this.m_bySourceId.writeMultiByte(_loc2_.readMultiByte(CommonConst.CONST_LENGTH_COMMAND_SOURCEID, CommonConst.SOCKET_DATA_ENCODE_GB), CommonConst.SOCKET_DATA_ENCODE_GB);
+            sumBytes += this.m_byVersion.length;
+            
+            this.m_bySourceId.writeMultiByte(responseDataParam.readMultiByte(CommonConst.CONST_LENGTH_COMMAND_SOURCEID, CommonConst.SOCKET_DATA_ENCODE_GB), CommonConst.SOCKET_DATA_ENCODE_GB);
             this.m_bySourceId.position = 0;
-            _loc5_ = _loc5_ + CommonConst.CONST_LENGTH_COMMAND_SOURCEID;
-            this.m_byDestId.writeMultiByte(_loc2_.readMultiByte(CommonConst.CONST_LENGTH_COMMAND_DESTID, CommonConst.SOCKET_DATA_ENCODE_GB), CommonConst.SOCKET_DATA_ENCODE_GB);
+            sumBytes += CommonConst.CONST_LENGTH_COMMAND_SOURCEID;
+            
+            this.m_byDestId.writeMultiByte(responseDataParam.readMultiByte(CommonConst.CONST_LENGTH_COMMAND_DESTID, CommonConst.SOCKET_DATA_ENCODE_GB), CommonConst.SOCKET_DATA_ENCODE_GB);
             this.m_byDestId.position = 0;
-            _loc5_ = _loc5_ + CommonConst.CONST_LENGTH_COMMAND_DESTID;
-            this.m_byCharSet.writeByte(_loc2_.readByte());
+            
+            sumBytes += CommonConst.CONST_LENGTH_COMMAND_DESTID;
+            this.m_byCharSet.writeByte(responseDataParam.readByte());
             this.m_byCharSet.position = 0;
-            _loc5_ = _loc5_ + this.m_byCharSet.length;
-            this.m_byReserve.writeMultiByte(_loc2_.readMultiByte(CommonConst.CONST_LENGTH_COMMAND_RESERVE, CommonConst.SOCKET_DATA_ENCODE_GB), CommonConst.SOCKET_DATA_ENCODE_GB);
+            sumBytes += this.m_byCharSet.length;
+            
+            this.m_byReserve.writeMultiByte(responseDataParam.readMultiByte(CommonConst.CONST_LENGTH_COMMAND_RESERVE, CommonConst.SOCKET_DATA_ENCODE_GB), CommonConst.SOCKET_DATA_ENCODE_GB);
             this.m_byReserve.position = 0;
-            _loc5_ = _loc5_ + CommonConst.CONST_LENGTH_COMMAND_RESERVE;
-            _loc4_.clear();
-            _loc4_.writeInt(_loc2_.readInt());
-            _loc4_.position = 0;
-            this.m_iPayloadLength = _loc4_.readInt();
+            sumBytes += CommonConst.CONST_LENGTH_COMMAND_RESERVE;
+            
+            parsedResult.clear();
+            parsedResult.writeInt(responseDataParam.readInt());
+            parsedResult.position = 0;
+            this.m_iPayloadLength = parsedResult.readInt();
             return GeneralError.SN_SUCCESS;
          }
          return GeneralError.SN_ERROR_INVALID_FUNCTION;

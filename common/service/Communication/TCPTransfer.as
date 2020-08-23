@@ -108,11 +108,11 @@ package common.service.Communication
       public function open() : void
       {
          this.m_objTCPSocket.open();
-         this.m_objTCPSocket.addEventListener(IOErrorEvent.IO_ERROR,this.socketFailHandler);
-         this.m_objTCPSocket.addEventListener(SecurityErrorEvent.SECURITY_ERROR,this.securityErrorHandler);
-         this.m_objTCPSocket.addEventListener(Event.CONNECT,this.connectHandler);
-         this.m_objTCPSocket.addEventListener(ProgressEvent.SOCKET_DATA,this.receiveDataHandler,false,1000);
-         this.m_objTCPSocket.addEventListener(Event.CLOSE,this.closeHandler);
+         this.m_objTCPSocket.addEventListener(IOErrorEvent.IO_ERROR, this.socketFailHandler);
+         this.m_objTCPSocket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.securityErrorHandler);
+         this.m_objTCPSocket.addEventListener(Event.CONNECT, this.connectHandler);
+         this.m_objTCPSocket.addEventListener(ProgressEvent.SOCKET_DATA, this.receiveDataHandler, false, 1000);
+         this.m_objTCPSocket.addEventListener(Event.CLOSE, this.closeHandler);
       }
       
       private function securityErrorHandler(param1:SecurityErrorEvent) : void
@@ -178,7 +178,7 @@ package common.service.Communication
       {
          var _loc2_:ByteArray = param1.getIP();
          _loc2_.position = 0;
-         this.m_objTCPSocket.connectTo(_loc2_.readMultiByte(_loc2_.length,CommonConst.SOCKET_DATA_ENCODE_GB),param1.Port);
+         this.m_objTCPSocket.connectTo(_loc2_.readMultiByte(_loc2_.length, CommonConst.SOCKET_DATA_ENCODE_GB),param1.Port);
       }
       
       public function set SessionId(param1:int) : void
@@ -257,13 +257,13 @@ package common.service.Communication
             return NetworkIOError.SN_ERROR_NETWORKIO_CONNECT_FAILED;
          }
          
-         this.m_objTCPSocket.readMultiByte(this.m_objTCPSocket.bytesAvailable,CommonConst.SOCKET_DATA_ENCODE_GB);
+         this.m_objTCPSocket.readMultiByte(this.m_objTCPSocket.bytesAvailable, CommonConst.SOCKET_DATA_ENCODE_GB);
          if(this.m_objCommandHandlerList.length > 0)
          {
             if(this.m_objCommandHandlerList[this.m_objCommandHandlerList.length - 1].isReceiveFlag())
             {
                this.removeTimoutInterval();
-               this.m_iReceiveTimeoutId = setInterval(this.checkReceiveTimeout,1000);
+               this.m_iReceiveTimeoutId = setInterval(this.checkReceiveTimeout, 1000);
             }
          }
          var date:Date = new Date();
@@ -330,9 +330,9 @@ package common.service.Communication
          var _loc1_:ByteArray = new ByteArray();
          if(this.m_objTCPSocket.Flag)
          {
-            this.m_objTCPSocket.readBytes(_loc1_,0,CommonConst.CONST_LENGTH_PACKET_HEAD);
+            this.m_objTCPSocket.readBytes(_loc1_, 0, CommonConst.CONST_LENGTH_PACKET_HEAD);
             _loc1_.position = 0;
-            var _loc2_:int = this.m_objPacketHead.parsePacketHead(_loc1_,CommonConst.CONST_LENGTH_PACKET_HEAD);
+            var _loc2_:int = this.m_objPacketHead.parsePacketHead(_loc1_, CommonConst.CONST_LENGTH_PACKET_HEAD);
             if(_loc2_ != GeneralError.SN_SUCCESS)
             {
                return _loc2_;

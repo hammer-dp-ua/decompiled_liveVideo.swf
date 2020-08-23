@@ -280,9 +280,9 @@ package common.service.Communication
       
       public function parsePacketHead(... rest) : int
       {
-         var _loc2_:ByteArray = null;
-         var _loc3_:int = 0;
-         var _loc4_:ByteArray = null;
+         var responseParam:ByteArray = null;
+         var parsedReadData:ByteArray = null;
+         
          if(rest.length == 1)
          {
             if(rest[0] is Buffer)
@@ -291,7 +291,7 @@ package common.service.Communication
                {
                   return NetworkIOError.SN_ERROR_PACKET_HEAD_PARSE_ERROR;
                }
-               this.parsePacketHead(rest[0].getData(),CommonConst.CONST_LENGTH_PACKET_HEAD);
+               this.parsePacketHead(rest[0].getData(), CommonConst.CONST_LENGTH_PACKET_HEAD);
             }
          }
          else if(rest.length == 2)
@@ -306,38 +306,48 @@ package common.service.Communication
                {
                   return NetworkIOError.SN_ERROR_PACKET_HEAD_PARSE_ERROR;
                }
-               _loc2_ = rest[0];
-               _loc2_.position = 0;
-               _loc3_ = 0;
-               this.m_byMagic.writeByte(_loc2_.readByte());
-               _loc3_ = _loc3_ + this.m_byMagic.length;
-               this.m_byVersion.writeByte(_loc2_.readByte());
-               _loc3_ = _loc3_ + this.m_byVersion.length;
-               _loc4_ = new ByteArray();
-               _loc4_.writeInt(_loc2_.readInt());
-               _loc4_.position = 0;
-               _loc3_ = _loc3_ + _loc4_.length;
-               this.m_iSeq = _loc4_.readInt();
-               _loc4_ = new ByteArray();
-               _loc4_.writeInt(_loc2_.readInt());
-               _loc4_.position = 0;
-               _loc3_ = _loc3_ + _loc4_.length;
-               this.m_iAck = _loc4_.readInt();
-               this.m_byFlag.writeByte(_loc2_.readByte());
-               _loc3_ = _loc3_ + this.m_byFlag.length;
-               _loc4_ = new ByteArray();
-               _loc4_.writeInt(_loc2_.readInt());
-               _loc4_.position = 0;
-               _loc3_ = _loc3_ + _loc4_.length;
-               this.m_iOffset = _loc4_.readInt();
-               _loc4_ = new ByteArray();
-               _loc4_.writeShort(_loc2_.readShort());
-               _loc4_.position = 0;
-               _loc3_ = _loc3_ + _loc4_.length;
-               this.m_iSessionId = _loc4_.readShort();
-               this.m_sReserve = _loc2_.readMultiByte(CommonConst.CONST_LENGTH_PACKET_RESERVE,CommonConst.SOCKET_DATA_ENCODE_GB);
-               _loc3_ = _loc3_ + CommonConst.CONST_LENGTH_PACKET_RESERVE;
-               this.m_iPayloadLength = _loc2_.readInt();
+               
+               responseParam = rest[0];
+               responseParam.position = 0;
+               sumBytes:int = 0;
+               
+               this.m_byMagic.writeByte(responseParam.readByte());
+               sumBytes += this.m_byMagic.length;
+               
+               this.m_byVersion.writeByte(responseParam.readByte());
+               sumBytes += this.m_byVersion.length;
+               
+               parsedReadData = new ByteArray();
+               parsedReadData.writeInt(responseParam.readInt());
+               parsedReadData.position = 0;
+               sumBytes += parsedReadData.length;
+               this.m_iSeq = parsedReadData.readInt();
+               
+               parsedReadData = new ByteArray();
+               parsedReadData.writeInt(responseParam.readInt());
+               parsedReadData.position = 0;
+               sumBytes += parsedReadData.length;
+               this.m_iAck = parsedReadData.readInt();
+               
+               this.m_byFlag.writeByte(responseParam.readByte());
+               sumBytes += this.m_byFlag.length;
+               
+               parsedReadData = new ByteArray();
+               parsedReadData.writeInt(responseParam.readInt());
+               parsedReadData.position = 0;
+               sumBytes += parsedReadData.length;
+               this.m_iOffset = parsedReadData.readInt();
+               
+               parsedReadData = new ByteArray();
+               parsedReadData.writeShort(responseParam.readShort());
+               parsedReadData.position = 0;
+               sumBytes += parsedReadData.length;
+               this.m_iSessionId = parsedReadData.readShort();
+               
+               this.m_sReserve = responseParam.readMultiByte(CommonConst.CONST_LENGTH_PACKET_RESERVE, CommonConst.SOCKET_DATA_ENCODE_GB);
+               sumBytes += CommonConst.CONST_LENGTH_PACKET_RESERVE;
+               
+               this.m_iPayloadLength = responseParam.readInt();
                return GeneralError.SN_SUCCESS;
             }
          }

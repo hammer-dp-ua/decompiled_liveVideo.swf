@@ -73,22 +73,23 @@ package common.logic.command
          }
       }
       
-      public function parseCommand(param1:Buffer) : int
+      public function parseCommand(responseBuffer:Buffer) : int
       {
-         var _loc2_:int = parseCommandHead(param1);
-         if(_loc2_ != GeneralError.SN_SUCCESS)
+         var parseCommandHeadStatus:int = parseCommandHead(responseBuffer);
+         if(parseCommandHeadStatus != GeneralError.SN_SUCCESS)
          {
-            return _loc2_;
+            return parseCommandHeadStatus;
          }
+         
          if(getCommondId() != CommandConst.CONST_COMMANDID_RESPONSE)
          {
             return CommandError.SN_ERROR_COMMAND_UNKNOW;
          }
-         if(param1.getDataLength() > CommonConst.CONST_MAXLENGTH_RESPONSEINFO)
+         if(responseBuffer.getDataLength() > CommonConst.CONST_MAXLENGTH_RESPONSEINFO)
          {
             return CommandError.SN_ERROR_COMMAND_PAYLOAD_PARSE_ERROR;
          }
-         if(getPayloadLength() != param1.getDataLength() - CommandHead.getLength())
+         if(getPayloadLength() != responseBuffer.getDataLength() - CommandHead.getLength())
          {
             return CommandError.SN_ERROR_COMMAND_PAYLOAD_PARSE_ERROR;
          }
@@ -96,24 +97,29 @@ package common.logic.command
          {
             return CommandError.SN_ERROR_COMMAND_PAYLOAD_PARSE_ERROR;
          }
-         var _loc3_:ByteArray = param1.getData();
-         var _loc4_:ByteArray = new ByteArray();
-         var _loc5_:int = 0;
+         
+         var responseData:ByteArray = responseBuffer.getData();
+         var readResult:ByteArray = new ByteArray();
+         var sumBytes:int = 0;
          var _loc6_:int = 0;
-         _loc4_.writeInt(_loc3_.readInt());
-         _loc4_.position = 0;
-         _loc5_ = _loc5_ + _loc4_.length;
-         this.m_objResponse.RequestId = _loc4_.readInt();
-         _loc4_ = new ByteArray();
-         _loc4_.writeInt(_loc3_.readInt());
-         _loc4_.position = 0;
-         _loc5_ = _loc5_ + _loc4_.length;
-         this.m_objResponse.SucceedFlag = _loc4_.readInt();
-         _loc4_ = new ByteArray();
-         _loc4_.writeInt(_loc3_.readInt());
-         _loc4_.position = 0;
-         _loc5_ = _loc5_ + _loc4_.length;
-         this.m_objResponse.ErrorNo = _loc4_.readInt();
+         
+         readResult.writeInt(responseData.readInt());
+         readResult.position = 0;
+         sumBytes += readResult.length;
+         this.m_objResponse.RequestId = readResult.readInt();
+         
+         readResult = new ByteArray();
+         readResult.writeInt(responseData.readInt());
+         readResult.position = 0;
+         sumBytes += readResult.length;
+         this.m_objResponse.SucceedFlag = readResult.readInt();
+         
+         readResult = new ByteArray();
+         readResult.writeInt(responseData.readInt());
+         readResult.position = 0;
+         sumBytes += readResult.length;
+         this.m_objResponse.ErrorNo = readResult.readInt();
+         
          return GeneralError.SN_SUCCESS;
       }
    }

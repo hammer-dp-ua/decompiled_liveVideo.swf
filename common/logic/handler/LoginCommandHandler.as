@@ -90,26 +90,27 @@ package common.logic.handler
          return GeneralError.SN_SUCCESS;
       }
       
-      public function parseCommand(param1:Buffer) : int
+      public function parseCommand(responseBuffer:Buffer) : int
       {
-         var _loc7_:int = 0;
-         var _loc2_:ResponseCommand = new ResponseCommand();
-         var _loc3_:int = _loc2_.parseCommand(param1);
-         if(_loc3_ != GeneralError.SN_SUCCESS)
+         var responseCommand:ResponseCommand = new ResponseCommand();
+         
+         var parseCommandStatus:int = responseCommand.parseCommand(responseBuffer);
+         if(parseCommandStatus != GeneralError.SN_SUCCESS)
          {
-            return _loc3_;
+            return parseCommandStatus;
          }
-         var _loc4_:Response = _loc2_.getResponse();
-         var _loc5_:int = _loc4_.RequestId;
-         if(_loc5_ != CommandConst.CONST_COMMANDID_LOGIN)
+         
+         var response:Response = responseCommand.getResponse();
+         var requestId:int = response.RequestId;
+         if(requestId != CommandConst.CONST_COMMANDID_LOGIN)
          {
             return SNError.SN_ERROR_NOT_EXPECT_RESPONSE;
          }
-         var _loc6_:int = _loc4_.SucceedFlag;
-         if(_loc6_ == Response.SUCCESSFLAG_ERROR)
+         
+         var succeedFlag:int = response.SucceedFlag;
+         if(succeedFlag == Response.SUCCESSFLAG_ERROR)
          {
-            _loc7_ = _loc4_.ErrorNo;
-            return _loc7_;
+            return response.ErrorNo;
          }
          return GeneralError.SN_SUCCESS;
       }
