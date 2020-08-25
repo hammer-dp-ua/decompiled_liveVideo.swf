@@ -27,35 +27,40 @@ package common.logic.command
          return this.m_iSessionId;
       }
       
-      public function getCommand(param1:Buffer) : int
+      public function getCommand(commandParam:Buffer) : int
       {
-         var _loc2_:ByteArray = new ByteArray();
-         _loc2_.writeShort(1);
-         _loc2_.position = 0;
-         var _loc3_:int = _loc2_.length;
-         var _loc4_:int = CommandHead.getLength() + _loc3_;
-         var _loc5_:Boolean = param1.alloc(_loc4_);
-         if(!_loc5_)
+         var sessionId:ByteArray = new ByteArray();
+         sessionId.writeShort(1);
+         sessionId.position = 0;
+         var sessionIdLength:int = sessionId.length;
+         var sumLength:int = CommandHead.getLength() + sessionIdLength;
+         var statusOk:Boolean = commandParam.alloc(sumLength);
+         if(!statusOk)
          {
             return GeneralError.SN_ERROR_NOT_ENOUGH_MEMORY;
          }
-         var _loc6_:Buffer = new Buffer();
-         setPayloadLength(_loc3_);
-         var _loc7_:int = getCommandHead(_loc6_);
-         if(_loc7_ != GeneralError.SN_SUCCESS)
+         
+         var commandHead:Buffer = new Buffer();
+         setPayloadLength(sessionIdLength);
+         
+         var commandHeadStatus:int = getCommandHead(commandHead);
+         if(commandHeadStatus != GeneralError.SN_SUCCESS)
          {
-            return _loc7_;
+            return commandHeadStatus;
          }
-         _loc5_ = param1.append(_loc6_);
-         if(!_loc5_)
+         
+         statusOk = commandParam.append(commandHead);
+         if(!statusOk)
          {
             return GeneralError.SN_ERROR_NOT_ENOUGH_MEMORY;
          }
-         _loc2_.clear();
-         _loc2_.writeShort(this.m_iSessionId);
-         _loc2_.position = 0;
-         _loc5_ = param1.append(_loc2_);
-         if(!_loc5_)
+         
+         sessionId.clear();
+         sessionId.writeShort(this.m_iSessionId);
+         sessionId.position = 0;
+         
+         statusOk = commandParam.append(sessionId);
+         if(!statusOk)
          {
             return GeneralError.SN_ERROR_NOT_ENOUGH_MEMORY;
          }

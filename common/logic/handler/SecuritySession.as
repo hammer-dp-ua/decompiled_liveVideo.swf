@@ -39,7 +39,7 @@ package common.logic.handler
       
       private var m_objTCPTransfer:TCPTransfer;
       
-      public function SecuritySession(param1:TCPTransfer, param2:DeviceInfoEx)
+      public function SecuritySession(objTCPTransferParam:TCPTransfer, objDeviceInfoExParam:DeviceInfoEx)
       {
          super();
          this.m_iTimeout = 5000;
@@ -50,8 +50,8 @@ package common.logic.handler
          this.m_bLoginFlag = false;
          this.m_iFlag = 0;
          this.m_Users = new Vector.<int>();
-         this.m_objTCPTransfer = param1;
-         this.m_objDeviceInfoEx = param2;
+         this.m_objTCPTransfer = objTCPTransferParam;
+         this.m_objDeviceInfoEx = objDeviceInfoExParam;
       }
       
       public function login(param1:int) : int
@@ -132,25 +132,29 @@ package common.logic.handler
          return GeneralError.SN_SUCCESS;
       }
       
-      public function parseLoginResponseCommand(param1:Buffer) : int
+      public function parseLoginResponseCommand(responseParam:Buffer) : int
       {
          var _loc7_:int = 0;
-         var _loc2_:ResponseCommand = new ResponseCommand();
-         var _loc3_:int = _loc2_.parseCommand(param1);
-         if(_loc3_ != GeneralError.SN_SUCCESS)
+         var responseCommand:ResponseCommand = new ResponseCommand();
+         
+         var status:int = responseCommand.parseCommand(responseParam);
+         if(status != GeneralError.SN_SUCCESS)
          {
-            return _loc3_;
+            return status;
          }
-         var _loc4_:Response = _loc2_.getResponse();
-         var _loc5_:int = _loc4_.RequestId;
-         if(_loc5_ != CommandConst.CONST_COMMANDID_LOGIN)
+         
+         var response:Response = responseCommand.getResponse();
+         
+         var requestId:int = response.RequestId;
+         if(requestId != CommandConst.CONST_COMMANDID_LOGIN)
          {
             return SNError.SN_ERROR_NOT_EXPECT_RESPONSE;
          }
-         var _loc6_:int = _loc4_.SucceedFlag;
+         
+         var _loc6_:int = response.SucceedFlag;
          if(_loc6_ == Response::SUCCESSFLAG_ERROR)
          {
-            _loc7_ = _loc4_.ErrorNo;
+            _loc7_ = response.ErrorNo;
             return _loc7_;
          }
          return GeneralError.SN_SUCCESS;

@@ -49,8 +49,8 @@ package common.sdk.sensor
          this.m_objTCPTransfer.setIsRealError(true);
          this.m_objTCPTransfer.setDestId(this.m_objDeviceInfoEx.DeviceID,this.m_objDeviceInfoEx.DeviceID.bytesAvailable);
          SensorUIData.m_iLanguage = param1;
-         var _loc4_:SecuritySession = new SecuritySession(this.m_objTCPTransfer,this.m_objDeviceInfoEx);
-         var _loc5_:ICommandHandler = new LoginCommandHandler(this.m_objTCPTransfer,this.m_objDeviceInfoEx,_loc4_);
+         var _loc4_:SecuritySession = new SecuritySession(this.m_objTCPTransfer, this.m_objDeviceInfoEx);
+         var _loc5_:ICommandHandler = new LoginCommandHandler(this.m_objTCPTransfer, this.m_objDeviceInfoEx,_loc4_);
          _loc5_.setReceiveFlag(true);
          var _loc6_:ICommandHandler = new SensorSupportFlagCommandHandler(this.m_objTCPTransfer);
          _loc6_.setReceiveFlag(true);
